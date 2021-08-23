@@ -1,0 +1,115 @@
+import java.util.ArrayList;
+import java.util.List;
+ 
+
+public class SD {
+         
+   
+    final static int SIZE = 26;
+     
+    
+    static class TrieNode
+    {
+        TrieNode[] children = new TrieNode[SIZE];
+     
+        
+        boolean isLeaf;
+         
+        
+        public TrieNode() {
+            isLeaf = false;
+            for (int i =0 ; i< SIZE ; i++)
+                    children[i] = null;
+        }
+    }
+     
+     
+    static TrieNode root;
+     
+    
+    static void insert(TrieNode root, String Key)
+    {
+        int n = Key.length();
+        TrieNode pCrawl = root;
+     
+        for (int i=0; i<n; i++)
+        {
+            int index = Key.charAt(i) - 'a';
+     
+            if (pCrawl.children[index] == null)
+                pCrawl.children[index] = new TrieNode();
+     
+            pCrawl = pCrawl.children[index];
+        }
+     
+        
+        pCrawl.isLeaf = true;
+    }
+     
+    
+    static List<Integer> findPrefix(TrieNode root, String key)
+    {
+        List<Integer> prefixPositions = new ArrayList<Integer>();
+        int level;
+        TrieNode pCrawl = root;
+     
+        for (level = 0; level < key.length(); level++)
+        {
+            int index = key.charAt(level) - 'a';
+            if (pCrawl.isLeaf == true)
+                prefixPositions.add(level);
+            if (pCrawl.children[index] == null)
+                return prefixPositions;
+     
+            pCrawl = pCrawl.children[index];
+        }
+        if (pCrawl != null && pCrawl.isLeaf)
+            prefixPositions.add(level); 
+         
+        return prefixPositions; 
+    }
+     
+    
+    static boolean isPossible(TrieNode root, String word)
+    {
+        
+        List<Integer> prefixPositions1 = findPrefix(root, word);
+     
+        
+        if (prefixPositions1.isEmpty())
+            return false;
+     
+        
+        for (Integer len1 : prefixPositions1) {
+            String restOfSubstring = word.substring(len1, word.length());
+            List<Integer> prefixPositions2 = findPrefix(root, restOfSubstring);
+            for (Integer len2 : prefixPositions2) {
+                
+                if (len1 + len2 == word.length())
+                    return true;
+            }
+        }
+         
+        return false;
+    }
+     
+    public static void main(String args[])
+    {
+        
+        String[] dictionary = {"news", "newspa", "paper", "geek"};
+     
+        String word = "newspaper"; //word to be formed
+     
+       
+        root = new TrieNode();
+     
+        
+        for (int i=0; i<dictionary.length; i++)
+            insert(root, dictionary[i]);
+     
+        if(isPossible(root, word))
+            System.out.println( "Yes");
+        else
+            System.out.println("No");
+    }
+}
